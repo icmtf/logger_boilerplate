@@ -2,8 +2,6 @@ import logging, os
 import logging.config
 import yaml
 
-# import child_script
-
 with open("logging_config.yaml", "r") as file:
     logger_config = yaml.safe_load(file.read())
 # Set up logfile name based on "app_name" key. Or else use default name.
