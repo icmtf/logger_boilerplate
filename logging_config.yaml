@@ -1,0 +1,68 @@
+app_name: "logging_boilerplate"
+version: 1
+disable_existing_loggers: False
+
+formatters:
+  columns_detailed:
+    format: '%(levelname)-8s | [%(process)d] f(%(funcName)s) in %(filename)s:%(lineno)d : %(message)s'
+  datetime_prefix:
+    format: '%(asctime)s, %(levelname)s (%(name)s) : %(message)s'
+    datefmt: '%Y-%m-%dT%H:%M:%S'  # ISO 8601
+    # datefmt: '%Y-%m-%dT%H:%M:%S%z'  # RFC 3339 date-time
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: columns_detailed
+    stream: ext://sys.stdout
+
+  file:
+    class: logging.FileHandler
+    level: INFO
+    formatter: datetime_prefix
+    filename: null
+
+  syslog:
+    class: logging.handlers.SysLogHandler
+    level: ERROR
+    formatter: datetime_prefix
+    address: /dev/log
+    # address: ('localhost', 514)
+
+loggers:
+  cli_logger:
+    level: DEBUG
+    handlers:
+      - console
+    propagate: no
+
+  file_logger:
+    level: INFO
+    handlers:
+      - file
+    propagate: no
+
+  syslogger:
+    file_logger:
+    level: INFO
+    handlers:
+      - syslog
+    propagate: no
+
+  # Single loggger with multiple handlers. This approach is good if you control levels from handlers.
+  # You also might need a separate loggers. But then keep in mind that handler level takes precedence.
+  # So if you set handler level to INFO but logger to DEBUG - handler will filter out DEBUG messages.
+  # single_logger:
+  #   level: DEBUG
+  #   handlers:
+  #     - console
+  #     - file
+  #     - syslog
+  #   propagate: no
+
+root:
+  level: DEBUG
+  handlers:
+    - console
+    - syslog
